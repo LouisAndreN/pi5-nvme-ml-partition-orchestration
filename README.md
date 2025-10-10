@@ -1,6 +1,4 @@
-# Smart Home Full Deployer on {Pi + NVMe}
-
-**Automated full-stack Smart Home installer for Raspberry Pi (NVMe boot)**
+# Automated Smart Home Full Deployer on {Pi + NVMe}
 
 This project provides a ready-to-use, automated deployment of a complete smart home system on a Raspberry Pi 5 with NVMe. It sets up all essential services so you can have an operational smart home. It includes a local storage server Nextcloud and a local proxy Squid for automated and securized updates of services.
 
