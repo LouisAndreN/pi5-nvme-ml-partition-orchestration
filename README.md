@@ -25,6 +25,8 @@ This project provides a ready-to-use, automated deployment of a complete smart h
 2. **Run the installation script**: it detects the NVMe, formats it if necessary, and copy the OS from SD card, Docker, and all services.  
 3. **Configuration is automatic**, including firewall, Docker containers, and essential services.  
 
+At the end, you will have lists of passwords for some services and certificates for Nextcloud and Home Assistant to import in your browser.
+
 > Optional: future versions may support other services, services selection and **network-based detection and automated deployment** with other devices.
 
 
