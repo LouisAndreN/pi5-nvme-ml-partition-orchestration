@@ -45,17 +45,6 @@ Now the Pi should boot Ubuntu Server on the NVMe and you can connect to it by SS
 
 詳細な手順は [Qiita記事]([https://qiita.com/YOUR_USERNAME/items/XXXXX](https://qiita.com/LouisAndreN/items/a5d286a591abda8e6553)) をご覧ください。
 
-## Future Features
-
-- **Auto-deployment of services** :
-    - **Firewall & security** — UFW, secure defaults, SSL support guidance
-    - **Docker & Docker Compose** — containerized, reproducible deployment
-    - **Squid Proxy** — caching and access control
-    - **MinIO & Nextcloud** — personal cloud, file sync, and media storage  
-    - **Home Assistant** — IoT automation hub for managing devices and scenes  
-    - **Mosquitto MQTT** — central hub for ESP devices and sensors  
-    - **ESPHome** — easy configuration for ESP-based devices  
-
 ---
 
 
