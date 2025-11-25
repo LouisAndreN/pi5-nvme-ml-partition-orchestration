@@ -16,6 +16,18 @@ The partitionning system is made as follows :
 
 
 
+`100 GB root` → OS (Ubuntu + kernels + initramfs + system packages = ~20GB) + Python/C++ dependencies + AI Frameworks (PyTorch, TensorFlow, Hailo SDK) + space for futures updates
+
+/var 120 GB → large space for cache containers and logs (InfluxDB, Prometheus, Grafana）
+
+/var/lib/containers 160 GB → space for volumes and images for Home Assistant, Frigate, Nextcloud, Portainer...
+
+/mnt/ml-data 230 GB → ML models, checkpoints, datasets
+
+/mnt/scratch 60 GB → C++, Rust, Hailo, AI tests
+
+/mnt/data 220 GB (btrfs) → ZSTD compression + snapshots for media, backups, personal data
+
 ---
 
 
