@@ -26,17 +26,6 @@ sudo fdisk -l /dev/nvme0n1 | grep "Disk /dev/nvme0n1"
 
 
 
-`100 GB root` → OS (Ubuntu + カーネル + initramfs + システムパケット = ~20GB) + Python/C++の依存関係 + AIフレームワーク (PyTorch、TensorFlow、Hailo SDKなど) 将来のアップデートに対応できる余裕
-
-/var 120 GB → コンテナーキャシュと大量のログ生成に対応できる余裕（InfluxDBとPrometheusとGrafanaなど）
-
-/var/lib/containers 160 GB → Home AssistantとFrigateとNextcloudとPortainerなどためのイメージ・ボリュームと対応できる余裕
-
-/mnt/ml-data 230 GB → モデル、チェックポイント、データセット。バージョニングモデルと実験的な試行に対応できる余裕
-
-/mnt/scratch 60 GB → C++・Rust・Hailo最適化、コンパイル、AIテスト用の高性能・隔離領域
-
-/mnt/data 220 GB (btrfs) → メディア、バックアップ、個人的なデータなどのため、ZSTD圧縮 + 自動的なスナップショット
 
 GPTテーブルを作成する：
 
