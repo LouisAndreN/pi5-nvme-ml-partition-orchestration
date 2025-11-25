@@ -25,7 +25,7 @@ sudo wipefs -a /dev/nvme0n1
 
 # Erase beginning and end of NVMe
 sudo dd if=/dev/zero of=/dev/nvme0n1 bs=1M count=10
-sudo dd if=/dev/zero of=/dev/nvme0n1 bs=1M count=10 seek=$((`blockdev --getsz /dev/nvme0n1`/2048 - 10))
+sudo dd if=/dev/zero of=/dev/nvme0n1 bs=1M count=10 seek=$((`sudo blockdev --getsz /dev/nvme0n1` / 2048 - 10))
 
 # Verify clean
 sudo blkid /dev/nvme0n1  # Should return nothing
