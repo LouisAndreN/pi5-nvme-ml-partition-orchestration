@@ -18,7 +18,7 @@ lspci | grep -i nvme
 sudo umount /dev/nvme0n1p*
 
 # Verify nothing mounted
-mount | grep nvme
+sudo mount | grep nvme
 
 # Wipe filesystem signatures
 sudo wipefs -a /dev/nvme0n1
@@ -66,7 +66,7 @@ sudo mkfs.xfs -f /dev/nvme0n1p6
 sudo mkfs.btrfs -f -L DATA /dev/nvme0n1p7
 
 # Verify
-lsblk -f /dev/nvme0n1
+sudo lsblk -f /dev/nvme0n1
 
 
 ## Save UUIDs
@@ -81,7 +81,7 @@ SCRATCH_UUID=$(sudo blkid -s UUID -o value /dev/nvme0n1p6)
 DATA_UUID=$(sudo blkid -s UUID -t TYPE=btrfs /dev/nvme0n1p7 -o value)
 
 # Save to file
-mkdir -p ~/nvme-setup
+sudo mkdir -p ~/nvme-setup
 cat > ~/nvme-setup/uuids.txt <<EOF
 BOOT_UUID=$BOOT_UUID
 ROOT_UUID=$ROOT_UUID
@@ -173,7 +173,7 @@ sudo nano /mnt/nvme_boot/cmdline.txt
 console=serial0,115200 multipath=off dwc_otg.lpm_enable=0 console=tty1 root=LABEL=writable rootfstype=ext4 rootwait fixrtc cfg80211.ieee80211_regdom=JP
 ```
 
-Verify:
+# Verify:
 wc -l /mnt/nvme_boot/cmdline.txt  # Should output: 1
 
 ## Configure fstab
