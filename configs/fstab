@@ -1,1 +1,11 @@
+UUID=$BOOT_UUID  /boot/firmware  vfat  defaults  0  2
+UUID=$ROOT_UUID  /  ext4  defaults,noatime  0  1
 
+UUID=$VAR_UUID  /var  ext4  defaults,noatime,barrier=1  0  2
+UUID=$CONTAINERS_UUID  /var/lib/containers  ext4  defaults,noatime,nodiratime,data=ordered  0  2
+
+UUID=$ML_DATA_UUID  /mnt/ml-data  ext4  defaults,noatime,nodiratime,data=writeback,commit=30  0  2
+UUID=$SCRATCH_UUID  /mnt/scratch  xfs  defaults,noatime,nodiratime,allocsize=16m,largeio  0  2
+
+UUID=$DATA_UUID  /mnt/data  btrfs  defaults,noatime,compress=zstd:3,space_cache=v2,autodefrag,commit=120  0  2
+tmpfs  /tmp  tmpfs  defaults,noatime,nosuid,nodev,size=2G  0  0
