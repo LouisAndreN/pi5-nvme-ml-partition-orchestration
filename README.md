@@ -1,6 +1,6 @@
 # Automated Smart Home Full Deployer on {Pi + NVMe}
 
-This project provides a deployment of a complete smart home system on a Raspberry Pi 5 with NVMe. It sets up an optimized partitioning system for Ubuntu Server LTS and domotic projects using ML and AI features.
+This project provides a deployment of a complete smart home system on a Raspberry Pi 5 with a NVMe of 1To. It sets up an optimized partitioning system for Ubuntu Server LTS and domotic projects using ML and AI features.
 
 The partitionning system is made as follows :
 
