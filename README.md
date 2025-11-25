@@ -2,6 +2,19 @@
 
 This project provides a deployment of a complete smart home system on a Raspberry Pi 5 with NVMe. It sets up an optimized partitioning system for Ubuntu Server LTS and domotic projects using ML and AI features.
 
+The partitionning system is made as follows :
+
+PARTITION         SIZE   FSTYPE  NAME             　　 UTILITY
+nvme0n1
+├─nvme0n1p1      1 GiB   vfat    /boot/firmware        Ubuntu Boot + space for kernels
+├─nvme0n1p2    100 GiB   ext4    /                     OS + libraries + AI frameworks + space for other services
+├─nvme0n1p3    140 GiB   ext4    /var                  logs + cache
+├─nvme0n1p4    180 GiB   ext4    /var/lib/containers   Containers (Docker or Podman)
+├─nvme0n1p5    230 GiB   ext4    /mnt/ml-data          ML models + datasets
+├─nvme0n1p6     60 GiB   xfs     /mnt/scratch          High performance buffer
+└─nvme0n1p7    240 GiB   btrfs   /mnt/data (残り)      Personal data + backups + snapshots
+
+
 ---
 
 
