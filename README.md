@@ -5,18 +5,6 @@ It uses Ubuntu Server LTS 23.03.4.
 
 The partitionning system is made as follows :
 
-| Partition      | Size   | Fstype | Mount Point / Name         | Utility                                    |
-|----------------|--------|--------|---------------------------|--------------------------------------------|
-| nvme0n1p1      | 1 GiB  | vfat   | /boot/firmware            | Ubuntu Boot + space for kernels            |
-| nvme0n1p2      | 100 GiB| ext4   | /                         | OS + libraries + AI frameworks + other services |
-| nvme0n1p3      | 140 GiB| ext4   | /var                      | Logs + cache                               |
-| nvme0n1p4      | 180 GiB| ext4   | /var/lib/containers       | Containers (Docker or Podman)             |
-| nvme0n1p5      | 230 GiB| ext4   | /mnt/ml-data              | ML models + datasets                        |
-| nvme0n1p6      | 60 GiB | xfs    | /mnt/scratch              | High performance buffer                     |
-| nvme0n1p7      | 240 GiB| btrfs  | /mnt/data (space left)    | Personal data + backups + snapshots        |
-
-# Partitionnement Ultime NVMe 1 To (Micron 2200) sur Raspberry Pi 5
-
 | Partition / LV          | Size     | FSType | Mount Point / Name                  | Utility / Description                                                                 |
 |-------------------------|----------|--------|-------------------------------------|---------------------------------------------------------------------------------------|
 | nvme0n1p1               | 1 GB     | vfat   | /boot/firmware                      | Ubuntu boot + kernels multiples                                                       |
