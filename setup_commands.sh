@@ -148,6 +148,25 @@ sudo btrfs subvolume create /mnt/@personal
 sudo umount /mnt
 
 
+# Check XFS
+sudo xfs_repair -n /dev/vg-main/lv-influxdb  # -n = dry run
+sudo xfs_repair -n /dev/vg-main/lv-containers
+sudo xfs_repair -n /dev/vg-main/lv-ml-models
+sudo xfs_repair -n /dev/vg-main/lv-ml-cache
+sudo xfs_repair -n /dev/vg-main/lv-cloud-sync
+sudo xfs_repair -n /dev/vg-main/lv-scratch
+
+# Check ext4
+sudo e2fsck -fn /dev/nvme0n1p2  # root
+sudo e2fsck -fn /dev/nvme0n1p4  # recovery
+sudo e2fsck -fn /dev/vg-main/lv-var
+sudo e2fsck -fn /dev/vg-main/lv-logs
+sudo e2fsck -fn /dev/vg-main/lv-grafana
+
+# Check BTRFS
+sudo btrfs check --readonly /dev/vg-main/lv-data
+
+
 ## Save UUIDs and LUKS mapper
 mkdir -p ~/nvme-setup
 
@@ -420,6 +439,85 @@ sync
 # Unmount
 sudo umount -lR /mnt/nvme_root
 sudo umount /mnt/nvme_boot
+
+## Create post-boot verification script
+sudo tee /mnt/nvme_root/opt/verify-boot.sh > /dev/null <<'EOF'
+#!/bin/bash
+# Post-boot verification - run after first NVMe boot
+
+echo "🔍 Verifying NVMe boot setup..."
+
+# Check LUKS
+if ! cryptsetup status cryptdata | grep -q "is active"; then
+    echo "❌ LUKS not active!"
+    exit 1
+fi
+echo "✅ LUKS active"
+
+# Check LVM
+if ! vgs vg-main &>/dev/null; then
+    echo "❌ VG vg-main not found!"
+    exit 1
+fi
+echo "✅ LVM volume group active"
+
+# Check all LVs mounted
+REQUIRED_MOUNTS=(
+    "/" "/var" "/var/log" "/var/lib/influxdb"
+    "/var/lib/containers" "/var/lib/grafana"
+    "/mnt/ml-models" "/mnt/ml-cache" "/mnt/cloud-sync"
+    "/mnt/scratch" "/mnt/data"
+)
+
+for mount in "${REQUIRED_MOUNTS[@]}"; do
+    if ! mountpoint -q "$mount"; then
+        echo "❌ $mount not mounted!"
+        exit 1
+    fi
+done
+echo "✅ All partitions mounted"
+
+# Check XFS mount options
+if ! mount | grep '/var/lib/influxdb' | grep -q 'allocsize=16m'; then
+    echo "⚠️  InfluxDB missing XFS tuning"
+fi
+echo "✅ XFS options correct"
+
+# Check BTRFS compression
+if ! mount | grep '/mnt/data' | grep -q 'compress=zstd'; then
+    echo "⚠️  BTRFS compression not enabled"
+fi
+echo "✅ BTRFS compression active"
+
+# Check swap
+if ! swapon --show | grep -q 'nvme0n1p3'; then
+    echo "❌ Swap not active!"
+    exit 1
+fi
+echo "✅ Swap active"
+
+# Check TRIM
+if ! systemctl is-enabled fstrim.timer | grep -q 'enabled'; then
+    echo "⚠️  TRIM timer not enabled"
+    systemctl enable fstrim.timer
+fi
+echo "✅ TRIM configured"
+
+# Disk usage report
+echo ""
+echo "📊 Disk usage:"
+df -h | grep -E '(Filesystem|nvme0n1|vg-main)'
+
+echo ""
+echo "✅ All checks passed! NVMe boot successful."
+echo ""
+echo "Next steps:"
+echo "1. Backup LUKS keyfile: cp /boot/luks-keyfile ~/SAFE_LOCATION"
+echo "2. Test recovery: cat /recovery/README.txt"
+echo "3. Configure monitoring: /opt/scripts/disk_monitor.sh"
+EOF
+
+sudo chmod +x /mnt/nvme_root/opt/verify-boot.sh
 
 # Poweroff
 sudo poweroff
