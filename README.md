@@ -18,13 +18,13 @@ The partitionning system is made as follows :
 
 | Partition      | Size   | Fstype | Mount Point / Name         | Utility                                    |
 |----------------|--------|--------|---------------------------|--------------------------------------------|
-|nvme0n1p1       │ 1 GB   │  vfat  │   /boot/firmware          │  Ubuntu boot + kernels multiples            |
-|nvme0n1p2       │ 100 GB │  ext4  │   /                       │  OS + libs + AI frameworks (Hailo SDK, PyTorch) + AWS CLI + Terraform + Azure CLI |
-|nvme0n1p3  │   16 GB  │  swap  │   swap            │  Swap dédié ML/Hailo (2× RAM, hors LVM pour perf)|
-|nvme0n1p4  │    5 GB  │  ext4  │   /recovery       │  Emergency rescue : Backup LUKS header + scripts repair + mini-tools (cryptsetup, lvm2, btrfs-progs, ddrescue) |
-|nvme0n1p5  │  838 GB  │  LUKS  │   cryptdata (encrypted) |
-|vg-main    |   838 GB  | LVM   |  Volume Group |
-     |lv-var    |   20 GB  | ext4  |  /var  │  Cache système (APT, systemd, tmp) |
+| nvme0n1p1      │ 1 GB   │  vfat  │   /boot/firmware          │  Ubuntu boot + kernels multiples            |
+| nvme0n1p2      │ 100 GB │  ext4  │   /                       │  OS + libs + AI frameworks (Hailo SDK, PyTorch) + AWS CLI + Terraform + Azure CLI |
+| nvme0n1p3      │   16 GB  │  swap  │   swap            │  Swap dédié ML/Hailo (2× RAM, hors LVM pour perf)|
+| nvme0n1p4      │    5 GB  │  ext4  │   /recovery       │  Emergency rescue : Backup LUKS header + scripts repair + mini-tools (cryptsetup, lvm2, btrfs-progs, ddrescue) |
+| nvme0n1p5       │  838 GB  │  LUKS  │   cryptdata (encrypted) |
+| vg-main         |   838 GB  | LVM   |  Volume Group |
+     | lv-var     |   20 GB  | ext4  |  /var  │  Cache système (APT, systemd, tmp) |
      |lv-logs    |  30 GB  | ext4  |  /var/log  │  Logs ESP32 + HA + Influx + cloud ops (rotation 7j, journald persistante) |
      |lv-influxdb| 120 GB  | xfs   |  /var/lib/influxdb  │  Timeseries IoT (tier 1-3 : 48h-30j ; tier 4 >30j export S3 quotidien via cron/MinIO gateway) |
      |lv-containers| 80 GB  | xfs  |   /var/lib/containers  │  Docker/Podman (HA, MQTT, Grafana, Nextcloud, MinIO, Prometheus – hors DB) |
