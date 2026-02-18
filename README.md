@@ -15,6 +15,35 @@ The partitionning system is made as follows :
 | nvme0n1p6      | 60 GiB | xfs    | /mnt/scratch              | High performance buffer                     |
 | nvme0n1p7      | 240 GiB| btrfs  | /mnt/data (space left)    | Personal data + backups + snapshots        |
 
+nvme0n1 (1 TB Samsung 990 PRO)
+├─nvme0n1p1  │    1 GB  │  vfat  │   /boot/firmware  │  Ubuntu boot + kernels multiples
+├─nvme0n1p2  │  100 GB  │  ext4  │   /               │  OS + libs + AI frameworks (Hailo SDK, PyTorch) + AWS CLI + Terraform + Azure CLI
+├─nvme0n1p3  │   16 GB  │  swap  │   swap            │  Swap dédié ML/Hailo (2× RAM, hors LVM pour perf)
+├─nvme0n1p4  │    5 GB  │  ext4  │   /recovery       │  Emergency rescue : Backup LUKS header + scripts repair + mini-tools (cryptsetup, lvm2, btrfs-progs, ddrescue)
+└─nvme0n1p5  │  838 GB  │  LUKS  │   cryptdata (encrypted)
+   └─vg-main     838 GB   LVM     Volume Group
+     ├─lv-var       20 GB   ext4    /var  │  Cache système (APT, systemd, tmp)
+     ├─lv-logs      30 GB   ext4    /var/log  │  Logs ESP32 + HA + Influx + cloud ops (rotation 7j, journald persistante)
+     ├─lv-influxdb 120 GB   xfs     /var/lib/influxdb  │  Timeseries IoT (tier 1-3 : 48h-30j ; tier 4 >30j export S3 quotidien via cron/MinIO gateway)
+     ├─lv-containers 80 GB   xfs     /var/lib/containers  │  Docker/Podman (HA, MQTT, Grafana, Nextcloud, MinIO, Prometheus – hors DB)
+     ├─lv-grafana   10 GB   ext4    /var/lib/grafana    │  Dashboards + provisioning + plugins + SQLite
+     ├─lv-ml-models  60 GB   xfs     /mnt/ml-models  │  ├─ production/ (modèles actifs Hailo)
+                                                     │  ├─ staging/ (A/B testing)
+                                                     │  ├─ archived/ (rollback)
+                                                     │  └─ datasets/ (training data local edge)
+     ├─lv-ml-cache   40 GB   xfs     /mnt/ml-cache   │  ├─ staging/ (validation SageMaker-like)
+                                                     │  ├─ training_data/ (export cloud)
+                                                     │  └─ logs/ (TensorBoard, métriques ML)
+     ├─lv-cloud-sync 80 GB   xfs     /mnt/cloud-sync  │  ├─ pending/ (Influx export en cours)
+                                                       │  ├─ uploading/ (upload S3/Azure en cours)
+                                                       │  ├─ uploaded/ (succès, rétention 7j)
+                                                       │  └─ failed/ (retry + alert Prometheus)
+     ├─lv-scratch    60 GB   xfs     /mnt/scratch    │  Buffer preprocessing (images caméra nowcasting, signatures électriques)
+     └─lv-data      338 GB   btrfs   /mnt/data   │  ├─ @iot-hot/     (données actives 7-30j, quota 100 GiB)
+                                                    ├─ @iot-archives (long terme multi-années, compression zstd:3 max)
+                                                    ├─ @backups      (snapshots LVM exportés, send/receive vers cloud)
+                                                    └─ @personal     (portfolio Git, docs, code source)
+
 
 
 / 100 GB → OS (Ubuntu + kernels + initramfs + system packages = ~20GB) + Python/C++ dependencies + AI Frameworks (PyTorch, TensorFlow, Hailo SDK) + space for futures updates
