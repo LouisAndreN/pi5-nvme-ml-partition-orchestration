@@ -76,6 +76,19 @@ sudo mkfs.ext4 -L RECOVERY /dev/nvme0n1p4
 sudo cryptsetup luksFormat /dev/nvme0n1p5
 # Choose very strong passphrase and save it !
 
+# Backup LUKS header
+sudo cryptsetup luksHeaderBackup /dev/nvme0n1p5 \
+    --header-backup-file /tmp/luks-header-backup.img
+
+# Copy to /recovery (once mounted)
+sudo mount /dev/nvme0n1p4 /mnt/nvme_recovery
+sudo mkdir -p /mnt/nvme_recovery/backup
+sudo cp /tmp/luks-header-backup.img /mnt/nvme_recovery/backup/
+sudo chmod 400 /mnt/nvme_recovery/backup/luks-header-backup.img
+
+# Check
+ls -lh /mnt/nvme_recovery/backup/
+
 # Open LUKS container
 sudo cryptsetup open /dev/nvme0n1p5 cryptdata
 
@@ -267,9 +280,12 @@ UUID=$RECOVERY_UUID   /recovery               ext4    defaults,noatime          
 /dev/vg-main/lv-grafana   /var/lib/grafana        ext4    defaults,noatime,nodiratime       0 2
 /dev/vg-main/lv-ml-models /mnt/ml-models           xfs     defaults,noatime,nodiratime,allocsize=16m,largeio  0 2
 /dev/vg-main/lv-ml-cache  /mnt/ml-cache           xfs     defaults,noatime,nodiratime,allocsize=16m  0 2
-/dev/vg-main/lv-cloud-sync /mnt/cloud-sync         xfs     defaults,noatime,nodiratime,allocsize=16m  0 2
-/dev/vg-main/lv-scratch   /mnt/scratch            xfs     defaults,noatime,nodiratime,allocsize=16m,nobarrier  0 2
-/dev/vg-main/lv-data      /mnt/data               btrfs   defaults,noatime,compress=zstd:3,space_cache=v2,autodefrag  0 2
+/dev/vg-main/lv-cloud-sync /mnt/cloud-sync         xfs     defaults,noatime,nodiratime,allocsize=64m,largeio,inode64  0 2
+/dev/vg-main/lv-scratch   /mnt/scratch            xfs     defaults,noatime,nodiratime,allocsize=16m,nobarrier,logbsize=256k  0 2
+/dev/vg-main/lv-data      /mnt/data               btrfs   defaults,noatime,compress=zstd:3,space_cache=v2,autodefrag,subvol=@iot-hot  0 2
+/dev/vg-main/lv-data      /mnt/data/archives      btrfs   defaults,noatime,compress=zstd:9,space_cache=v2,subvol=@iot-archives  0 2
+/dev/vg-main/lv-data      /mnt/data/backups       btrfs   defaults,noatime,compress=zstd:3,space_cache=v2,subvol=@backups  0 2
+/dev/vg-main/lv-data      /mnt/data/personal      btrfs   defaults,noatime,compress=zstd:3,space_cache=v2,subvol=@personal  0 2
 
 tmpfs                     /tmp                    tmpfs   defaults,noatime,nosuid,nodev,size=2G  0 0
 tmpfs                     /var/tmp                tmpfs   defaults,noatime,nosuid,nodev,size=1G  0 0
