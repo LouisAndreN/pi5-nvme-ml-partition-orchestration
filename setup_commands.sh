@@ -118,7 +118,7 @@ sudo lvchange --readahead 8192 vg-main/lv-influxdb  # 4MB readahead
 sudo lvchange --zero n vg-main/lv-influxdb         # Pas de zero on new blocks
 
 # Cloud-sync (gros transferts)
-sudo lvchange --readahead 16384 vg-main/lv-cloud-sync  # 8MB readahead
+sudo lvchange --readahead 8192 vg-main/lv-cloud-sync   # 4MB readahead
 
 # ML-cache (gros fichiers)
 sudo lvchange --readahead 8192 vg-main/lv-ml-cache
@@ -452,8 +452,28 @@ case $1 in
 esac
 
 . /usr/share/initramfs-tools/hook-functions
+
+# Check keyfile existe
+if [ ! -f /boot/luks-keyfile ]; then
+    echo "WARNING: /boot/luks-keyfile not found!" >&2
+    echo "LUKS will require manual passphrase at boot!" >&2
+    exit 0  # Continue sans erreur (fallback passphrase)
+fi
+
+# Copy keyfile to initramfs
 mkdir -p "${DESTDIR}/boot"
 cp /boot/luks-keyfile "${DESTDIR}/boot/"
+
+# Verify copy succeeded
+if [ ! -f "${DESTDIR}/boot/luks-keyfile" ]; then
+    echo "ERROR: Failed to copy LUKS keyfile to initramfs!" >&2
+    exit 1
+fi
+
+# Set permissions in initramfs
+chmod 400 "${DESTDIR}/boot/luks-keyfile"
+
+echo "LUKS keyfile added to initramfs" >&2
 EOF
 
 chmod +x /etc/initramfs-tools/hooks/copy-luks-key
