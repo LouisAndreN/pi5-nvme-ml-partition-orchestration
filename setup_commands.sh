@@ -1,4 +1,4 @@
-# Pi 5 NVMe 1To Setup - Command Reference for Ubuntu Server 24.04 LTS boot
+# Pi 5 NVMe 1To Setup - Command Reference for Ubuntu Server 24.04.3 LTS boot
 
 # Install needed packages
 sudo apt update
