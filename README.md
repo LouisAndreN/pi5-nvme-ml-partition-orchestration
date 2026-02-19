@@ -1,7 +1,9 @@
 # NVMe Encrypted LVM Setup for Edge IoT/ML on Raspberry Pi 5
 
 This project provides an optimized configuration and partitionning system on a 1 TB NVMe, booted on Raspberry Pi 5, optimized for orchestration of Edge AI devices, ML models and services for an advanced smart home.
-It uses Ubuntu Server LTS 23.03.4 and tested on Micron 2200 NVMe – read: BW=~850–950 MB/s et write: BW=~750–900 MB/s
+It uses Ubuntu Server LTS 23.03.4 and tested on Micron 2200 NVMe 
+– read: BW=~850–950 MB/s 
+- write: BW=~750–900 MB/s
 
 - The script `/opt/verify-boot.sh` is generated automatically during the installation and launched manually after the first boot on NVMe to validate all mounts LUKS, LVM, FS tuning, TRIM, etc.
 
