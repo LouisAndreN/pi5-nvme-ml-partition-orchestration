@@ -17,7 +17,7 @@ The partitionning system is made as follows :
 | ├─ vg-main              | 838 GB   | LVM    | Volume Group                        | Group LVM Volume on cryptdata                                                        |
 | ├─ lv-var               | 20 GB    | ext4   | /var                                | System cache (APT, systemd, tmp)                                                     |
 | ├─ lv-logs              | 30 GB    | ext4   | /var/log                            | Logs ESP32 + HA + Influx + cloud ops (7 days rotation, persistant journald)          |
-| ├─ lv-influxdb          | 120 GB   | xfs    | /var/lib/influxdb                   | IoT Timeseries (tier 1-3 : 48h-30d ; tier 4 >30j S3 export daily through cron/MinIO gateway) |
+| ├─ lv-influxdb          | 120 GB   | xfs    | /var/lib/influxdb                   | IoT Timeseries (tier 1-3 : 48h-30d ; tier 4 >30j) S3 export daily through cron/MinIO gateway) |
 | ├─ lv-containers        | 80 GB    | xfs    | /var/lib/containers                 | Docker/Podman (HA, MQTT, Grafana, Nextcloud, MinIO, Prometheus – except DB)          |
 | ├─ lv-grafana           | 10 GB    | ext4   | /var/lib/grafana                    | Dashboards + provisioning + plugins + SQLite                                         |
 | ├─ lv-ml-models         | 60 GB    | xfs    | /mnt/ml-models                      | production/ (active models Hailo)<br>staging/ (A/B testing)<br>archived/ (rollback)<br>datasets/ (training data local edge) |
