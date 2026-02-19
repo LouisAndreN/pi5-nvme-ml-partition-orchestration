@@ -384,9 +384,6 @@ UUID=$RECOVERY_UUID   /recovery               ext4    defaults,noatime          
 /dev/vg-main/lv-cloud-sync /mnt/cloud-sync         xfs     defaults,noatime,nodiratime,allocsize=64m,largeio,inode64  0 2
 /dev/vg-main/lv-scratch   /mnt/scratch            xfs     defaults,noatime,nodiratime,allocsize=16m,nobarrier,logbsize=256k  0 2
 /dev/vg-main/lv-data      /mnt/data               btrfs   defaults,noatime,compress=zstd:3,space_cache=v2,autodefrag,subvol=@iot-hot  0 2
-/dev/vg-main/lv-data      /mnt/data/archives      btrfs   defaults,noatime,compress=zstd:9,space_cache=v2,subvol=@iot-archives  0 2
-/dev/vg-main/lv-data      /mnt/data/backups       btrfs   defaults,noatime,compress=zstd:3,space_cache=v2,subvol=@backups  0 2
-/dev/vg-main/lv-data      /mnt/data/personal      btrfs   defaults,noatime,compress=zstd:3,space_cache=v2,subvol=@personal  0 2
 
 tmpfs                     /tmp                    tmpfs   defaults,noatime,nosuid,nodev,size=2G  0 0
 tmpfs                     /var/tmp                tmpfs   defaults,noatime,nosuid,nodev,size=1G  0 0
@@ -394,6 +391,61 @@ EOF
 
 # Verify
 cat /mnt/nvme_root/etc/fstab
+
+# Archives
+sudo tee /mnt/nvme_root/etc/systemd/system/mnt-data-archives.mount > /dev/null <<'EOF'
+[Unit]
+Description=BTRFS IoT Archives Subvolume (High Compression)
+After=mnt-data.mount
+Requires=mnt-data.mount
+
+[Mount]
+What=/dev/vg-main/lv-data
+Where=/mnt/data/archives
+Type=btrfs
+Options=defaults,noatime,compress=zstd:9,space_cache=v2,subvol=@iot-archives
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Backups
+sudo tee /mnt/nvme_root/etc/systemd/system/mnt-data-backups.mount > /dev/null <<'EOF'
+[Unit]
+Description=BTRFS System Backups Subvolume
+After=mnt-data.mount
+Requires=mnt-data.mount
+
+[Mount]
+What=/dev/vg-main/lv-data
+Where=/mnt/data/backups
+Type=btrfs
+Options=defaults,noatime,compress=zstd:3,space_cache=v2,subvol=@backups
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Personal
+sudo tee /mnt/nvme_root/etc/systemd/system/mnt-data-personal.mount > /dev/null <<'EOF'
+[Unit]
+Description=BTRFS Personal Data Subvolume
+After=mnt-data.mount
+Requires=mnt-data.mount
+
+[Mount]
+What=/dev/vg-main/lv-data
+Where=/mnt/data/personal
+Type=btrfs
+Options=defaults,noatime,compress=zstd:3,space_cache=v2,subvol=@personal
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Créer répertoires mount points
+sudo mkdir -p /mnt/nvme_root/mnt/data/{archives,backups,personal}
+
 
 ## Configure crypttab (automatic unlock with keyfile - headless)
 sudo dd if=/dev/urandom of=/mnt/nvme_boot/luks-keyfile bs=512 count=1
@@ -507,6 +559,11 @@ echo "sha256" >> /etc/initramfs-tools/modules
 
 # Regenerate initramfs with crypttab + keyfile
 update-initramfs -u -k all
+
+# Enable BTRFS subvolume mount units
+systemctl enable mnt-data-archives.mount
+systemctl enable mnt-data-backups.mount
+systemctl enable mnt-data-personal.mount
 
 # Exit chroot
 exit
