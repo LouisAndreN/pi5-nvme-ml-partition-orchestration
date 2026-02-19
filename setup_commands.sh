@@ -73,7 +73,13 @@ sudo mkswap -L SWAP-ML /dev/nvme0n1p3
 sudo mkfs.ext4 -L RECOVERY /dev/nvme0n1p4
 
 # p5 LUKS (encryption)
-sudo cryptsetup luksFormat /dev/nvme0n1p5
+# Configuration LUKS2 encryption
+# Parameters:
+#   - Algorithm: AES-XTS-256 (512-bit key)
+#   - PBKDF: Argon2id (GPU-resistant)
+#   - Sector size: 4096 bytes (NVMe native) (better performance but compatible only with kernel 5.9+)
+#   - Iteration time: 1000ms (fast boot)
+sudo cryptsetup luksFormat /dev/nvme0n1p5 --type luks2 --cipher aes-xts-plain64 --key-size 512 --pbkdf argon2id --iter-time 1000 --label "cryptdata"
 # Choose very strong passphrase and save it !
 
 # Backup LUKS header
@@ -265,8 +271,13 @@ This partition contains:
 - Recovery scripts (scripts/)
 - Emergency tools
 
+⚠️  LUKS CONFIGURATION:
+- LUKS2 with 4096-byte sectors (requires kernel 5.9+)
+- If using rescue USB: ensure kernel 5.9+ or decrypt will FAIL
+- Ubuntu 22.04+ live USB recommended (kernel 6.2+)
+
 DISASTER RECOVERY STEPS:
-1. Boot from USB/SD card
+1. Boot from USB/SD card with kernel 5.9+ (check: uname -r)
 2. Mount this partition: mount /dev/nvme0n1p4 /mnt
 3. Run: bash /mnt/scripts/unlock-luks.sh
 4. Mount filesystems as needed
@@ -278,6 +289,10 @@ cryptsetup luksHeaderRestore /dev/nvme0n1p5 \\
 LUKS DIAGNOSTICS:
 # Show LUKS header info and key slots
 cryptsetup luksDump /dev/nvme0n1p5
+
+# Check sector size (should show 4096)
+cryptsetup luksDump /dev/nvme0n1p5 | grep "sector size"
+# Output: Payload sector size:     4096
 
 # Check which key slots are active
 # Slot 0: Original passphrase
