@@ -372,7 +372,7 @@ source ~/nvme-setup/uuids.txt
 sudo tee /mnt/nvme_root/etc/fstab > /dev/null <<EOF
 UUID=$BOOT_UUID       /boot/firmware          vfat    defaults                          0 2
 UUID=$ROOT_UUID       /                       ext4    defaults,noatime                  0 1
-UUID=$SWAP_UUID       none                    swap    sw                                0 0
+UUID=$SWAP_UUID       none                    swap    sw,pri=-2                         0 0
 UUID=$RECOVERY_UUID   /recovery               ext4    defaults,noatime                  0 2
 
 /dev/vg-main/lv-var       /var                    ext4    defaults,noatime,nodiratime       0 2
@@ -656,12 +656,39 @@ for unit in mnt-data-archives.mount mnt-data-backups.mount mnt-data-personal.mou
     fi
 done
 
-# Check swap
-if ! swapon --show | grep -q 'nvme0n1p3'; then
-    echo "❌ Swap not active!"
-    exit 1
+# Check swap configuration
+echo ""
+echo "Checking swap configuration..."
+if ! swapon --show | grep -q 'zram0'; then
+    echo "⚠️  zram swap not active!"
+    echo "  Run: sudo systemctl start systemd-zram-setup@zram0.service"
+else
+    echo "✅ zram swap active"
 fi
-echo "✅ Swap active"
+
+# Show swap details
+echo ""
+echo "📊 Swap configuration:"
+swapon --show
+echo ""
+echo "Expected:"
+echo "  NAME           TYPE      SIZE USED PRIO"
+echo "  /dev/zram0     partition   4G   0B  100  ← High priority (used first)"
+echo "  /dev/nvme0n1p3 partition   4G   0B   -2  ← Low priority (fallback)"
+
+# Show zram stats
+if [ -e /dev/zram0 ]; then
+    echo ""
+    echo "📊 zram details:"
+    zramctl /dev/zram0
+    echo ""
+    echo "Expected compression ratio: 2-3:1 (zstd)"
+fi
+
+# Check NVMe swap present (fallback)
+if ! swapon --show | grep -q 'nvme0n1p3'; then
+    echo "⚠️  NVMe swap partition not active"
+fi
 
 # Check TRIM
 if ! systemctl is-enabled fstrim.timer | grep -q 'enabled'; then
