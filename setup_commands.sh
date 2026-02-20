@@ -82,7 +82,7 @@ sudo mkfs.ext4 -L RECOVERY /dev/nvme0n1p4
 sudo cryptsetup luksFormat /dev/nvme0n1p5 --type luks2 --cipher aes-xts-plain64 --key-size 512 --pbkdf argon2id --iter-time 2000 --label "cryptdata"
 # Choose very strong passphrase and save it !
 
-# Verification : PBKDF: argon2id, Time cost, Memory, Threads, Cipher, Sector size=4096
+# Verification : PBKDF: argon2id, Time cost, Memory, Threads, Cipher, Payload Sector size=4096 (=> check if alignment error but okay if 1MiB aligned)
 sudo cryptsetup luksDump /dev/nvme0n1p5
 
 # Backup LUKS header
