@@ -61,7 +61,7 @@ quit
 
 ## Format partitions
 # p1 boot
-sudo mkfs.vfat -F32 -n BOOT-FW /dev/nvme0n1p1
+sudo mkfs.vfat -F32 -n BOOT /dev/nvme0n1p1
 
 # p2 root
 sudo mkfs.ext4 -L ROOT /dev/nvme0n1p2
