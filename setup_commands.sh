@@ -67,7 +67,7 @@ sudo mkfs.vfat -F32 -n BOOT /dev/nvme0n1p1
 sudo mkfs.ext4 -L ROOT /dev/nvme0n1p2
 
 # p3 swap
-sudo mkswap -L SWAP-ML /dev/nvme0n1p3
+sudo mkswap -L SWAP /dev/nvme0n1p3
 
 # p4 recovery
 sudo mkfs.ext4 -L RECOVERY /dev/nvme0n1p4
