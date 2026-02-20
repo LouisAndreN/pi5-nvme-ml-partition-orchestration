@@ -2,7 +2,7 @@
 
 # Install needed packages
 sudo apt update
-sudo apt install -y lvm2 cryptsetup btrfs-progs xfsprogs parted rsync mc awscli  # mc = MinIO client, awscli pour S3
+sudo apt install -y lvm2 cryptsetup btrfs-progs xfsprogs parted rsync mc unzip curl  # mc = MinIO client
 
 ## Prerequisites Check
 
