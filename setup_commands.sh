@@ -182,21 +182,21 @@ sudo btrfs check --readonly /dev/vg-main/lv-data
 ## Save UUIDs and LUKS mapper
 mkdir -p ~/nvme-setup
 
-BOOT_UUID=$(blkid -s UUID -o value /dev/nvme0n1p1)
-ROOT_UUID=$(blkid -s UUID -o value /dev/nvme0n1p2)
-SWAP_UUID=$(blkid -s UUID -o value /dev/nvme0n1p3)
-RECOVERY_UUID=$(blkid -s UUID -o value /dev/nvme0n1p4)
+BOOT_UUID=$(sudo blkid -s UUID -o value /dev/nvme0n1p1)
+ROOT_UUID=$(sudo blkid -s UUID -o value /dev/nvme0n1p2)
+SWAP_UUID=$(sudo blkid -s UUID -o value /dev/nvme0n1p3)
+RECOVERY_UUID=$(sudo blkid -s UUID -o value /dev/nvme0n1p4)
 
-VAR_UUID=$(blkid -s UUID -o value /dev/vg-main/lv-var)
-LOGS_UUID=$(blkid -s UUID -o value /dev/vg-main/lv-logs)
-INFLUXDB_UUID=$(blkid -s UUID -o value /dev/vg-main/lv-influxdb)
-CONTAINERS_UUID=$(blkid -s UUID -o value /dev/vg-main/lv-containers)
-GRAFANA_UUID=$(blkid -s UUID -o value /dev/vg-main/lv-grafana)
-MLMODELS_UUID=$(blkid -s UUID -o value /dev/vg-main/lv-ml-models)
-MLCACHE_UUID=$(blkid -s UUID -o value /dev/vg-main/lv-ml-cache)
-CLOUDSYNC_UUID=$(blkid -s UUID -o value /dev/vg-main/lv-cloud-sync)
-SCRATCH_UUID=$(blkid -s UUID -o value /dev/vg-main/lv-scratch)
-DATA_UUID=$(blkid -s UUID -o value /dev/vg-main/lv-data)
+VAR_UUID=$(sudo blkid -s UUID -o value /dev/vg-main/lv-var)
+LOGS_UUID=$(sudo blkid -s UUID -o value /dev/vg-main/lv-logs)
+INFLUXDB_UUID=$(sudo blkid -s UUID -o value /dev/vg-main/lv-influxdb)
+CONTAINERS_UUID=$(sudo blkid -s UUID -o value /dev/vg-main/lv-containers)
+GRAFANA_UUID=$(sudo blkid -s UUID -o value /dev/vg-main/lv-grafana)
+MLMODELS_UUID=$(sudo blkid -s UUID -o value /dev/vg-main/lv-ml-models)
+MLCACHE_UUID=$(sudo blkid -s UUID -o value /dev/vg-main/lv-ml-cache)
+CLOUDSYNC_UUID=$(sudo blkid -s UUID -o value /dev/vg-main/lv-cloud-sync)
+SCRATCH_UUID=$(sudo blkid -s UUID -o value /dev/vg-main/lv-scratch)
+DATA_UUID=$(sudo blkid -s UUID -o value /dev/vg-main/lv-data)
 
 cat > ~/nvme-setup/uuids.txt <<EOF
 BOOT_UUID=$BOOT_UUID
@@ -249,19 +249,19 @@ sudo tee /mnt/nvme_recovery/scripts/unlock-luks.sh > /dev/null <<'EOF'
 #!/bin/bash
 # Emergency LUKS unlock script
 
-echo "🔓 Unlocking LUKS container..."
+echo "Unlocking LUKS container..."
 
 if [ -f /boot/luks-keyfile ]; then
     cryptsetup open /dev/nvme0n1p5 cryptdata --key-file /boot/luks-keyfile
 else
-    echo "⚠️  Keyfile not found, using backup header..."
+    echo "Keyfile not found, using backup header..."
     cryptsetup luksHeaderRestore /dev/nvme0n1p5 \
         --header-backup-file /recovery/backup/luks-header-backup.img
     cryptsetup open /dev/nvme0n1p5 cryptdata
 fi
 
 vgchange -ay vg-main
-echo "✅ LVM volumes activated"
+echo "LVM volumes activated"
 EOF
 
 sudo chmod +x /mnt/nvme_recovery/scripts/unlock-luks.sh
@@ -277,7 +277,7 @@ This partition contains:
 - Recovery scripts (scripts/)
 - Emergency tools
 
-⚠️  LUKS CONFIGURATION:
+|!| LUKS CONFIGURATION:
 - LUKS2 with 4096-byte sectors (requires kernel 5.9+)
 - If using rescue USB: ensure kernel 5.9+ or decrypt will FAIL
 - Ubuntu 22.04+ live USB recommended (kernel 6.2+)
@@ -301,7 +301,7 @@ cryptsetup luksDump /dev/nvme0n1p5 | grep "sector size"
 # Output: Payload sector size:     4096
 
 # Check which key slots are active
-# Slot 0: Original passphrase
+# Slot 0: Original passphraseB
 # Slot 1: Keyfile (/boot/luks-keyfile)
 
 PASSPHRASE RECOVERY:
@@ -313,8 +313,8 @@ If passphrase forgotten but keyfile available:
    cryptsetup luksKillSlot /dev/nvme0n1p5 0
 
 COMPLETE FAILURE (both passphrase + keyfile lost):
-❌ Data is UNRECOVERABLE (encryption working as designed)
-✅ This is why backups exist (/mnt/data/backups)
+Data is UNRECOVERABLE (encryption working as designed)
+This is why backups exist (/mnt/data/backups)
 
 Created: $(date)
 System: Raspberry Pi 5 + NVMe 1TB + Hailo-8L
