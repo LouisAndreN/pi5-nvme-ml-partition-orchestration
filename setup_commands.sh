@@ -90,6 +90,7 @@ sudo cryptsetup luksHeaderBackup /dev/nvme0n1p5 \
     --header-backup-file /tmp/luks-header-backup.img
 
 # Copy to /recovery (once mounted)
+sudo mkdir -p /mnt/nvme_recovery
 sudo mount /dev/nvme0n1p4 /mnt/nvme_recovery
 sudo mkdir -p /mnt/nvme_recovery/backup
 sudo cp /tmp/luks-header-backup.img /mnt/nvme_recovery/backup/
