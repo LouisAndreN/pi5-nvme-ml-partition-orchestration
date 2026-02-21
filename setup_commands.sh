@@ -367,10 +367,6 @@ sudo rsync -axHAWX --info=progress2 \
   --exclude=/var/lost+found \
   /var/ /mnt/nvme_var/
 
-# Copy containers separately
-sudo rsync -axHAWX --info=progress2 \
-  /var/lib/containers/ /mnt/nvme_containers/
-
 
 ## Configure cmdline.txt
 
