@@ -278,7 +278,6 @@ This partition contains:
 - Emergency tools
 
 |!| LUKS CONFIGURATION:
-- LUKS2 with 4096-byte sectors (requires kernel 5.9+)
 - If using rescue USB: ensure kernel 5.9+ or decrypt will FAIL
 - Ubuntu 22.04+ live USB recommended (kernel 6.2+)
 
@@ -367,6 +366,9 @@ sudo rsync -axHAWX --info=progress2 \
   --exclude=/var/lost+found \
   /var/ /mnt/nvme_var/
 
+# OPTIONNAL: Copy containers separately (if exists in SD and not empty)
+sudo rsync -axHAWX --info=progress2 \
+  /var/lib/containers/ /mnt/nvme_containers/
 
 ## Configure cmdline.txt
 
@@ -397,9 +399,9 @@ UUID=$RECOVERY_UUID   /recovery               ext4    defaults,noatime          
 /dev/vg-main/lv-influxdb  /var/lib/influxdb       xfs     defaults,noatime,allocsize=16m,inode64  0 2
 /dev/vg-main/lv-containers /var/lib/containers    xfs     defaults,noatime,allocsize=16m  0 2
 /dev/vg-main/lv-grafana   /var/lib/grafana        ext4    defaults,noatime,nodiratime       0 2
-/dev/vg-main/lv-ml-models /mnt/ml-models           xfs     defaults,noatime,allocsize=16m  0 2
+/dev/vg-main/lv-ml-models /mnt/ml-models          xfs     defaults,noatime,allocsize=16m  0 2
 /dev/vg-main/lv-ml-cache  /mnt/ml-cache           xfs     defaults,noatime,allocsize=16m  0 2
-/dev/vg-main/lv-cloud-sync /mnt/cloud-sync         xfs     defaults,noatime,allocsize=64m,inode64  0 2
+/dev/vg-main/lv-cloud-sync /mnt/cloud-sync        xfs     defaults,noatime,allocsize=64m,inode64  0 2
 /dev/vg-main/lv-scratch   /mnt/scratch            xfs     defaults,noatime,allocsize=16m,nobarrier,logbsize=256k  0 2
 /dev/vg-main/lv-data      /mnt/data               btrfs   defaults,noatime,compress=zstd:3,space_cache=v2,subvol=@iot-hot  0 2
 
